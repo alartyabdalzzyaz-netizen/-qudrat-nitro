@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>قدرات نايترو</title>
+<style>
+:root{--bg:#f4f6f8;--ink:#111827;--muted:#6b7280;--card:#fff;--line:#e5e7eb;--blue:#eaf2ff;--green:#eaf8ef;--yellow:#fff6d7;--red:#fdecec}
+*{box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial;margin:0;background:var(--bg);color:var(--ink)}
+header{background:#111827;color:#fff;padding:16px;position:sticky;top:0;z-index:10}.wrap{max-width:850px;margin:auto;padding:16px}.brand{font-size:22px;font-weight:900}
+.card{background:#fff;border-radius:18px;padding:18px;margin:12px 0;box-shadow:0 5px 18px #0001}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+button,input,textarea,select{font:inherit}input,textarea,select{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;margin:6px 0 10px;background:#fff}
+.btn{border:0;border-radius:12px;padding:11px 14px;font-weight:800;cursor:pointer}.primary{background:#111827;color:#fff}.secondary{background:#e5e7eb}.danger{background:#b42318;color:#fff}
+.choice{border:0;border-radius:18px;padding:20px;text-align:right;min-height:130px;cursor:pointer}.f{background:var(--blue)}.t{background:var(--green)}
+.muted{color:var(--muted)}.hidden{display:none}.day{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;margin:7px 0;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.pill{display:inline-block;background:#eef2f7;border-radius:99px;padding:5px 9px;font-size:12px}.tabs{display:flex;gap:8px;overflow:auto;margin:10px 0}.tabs button{border:0;border-radius:10px;padding:9px 12px;white-space:nowrap}.on{background:#111827!important;color:#fff}
+.read{padding:14px;border-radius:14px;margin:8px 0}.why{background:var(--yellow)}.how{background:var(--blue)}.remember{background:var(--green)}.mistake{background:var(--red)}
+.option{display:block;width:100%;text-align:right;padding:10px;margin:6px 0;border:1px solid #ddd;border-radius:10px;background:#fff}.sel{border-color:#2563eb;background:#eef5ff}
+.kbd{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:8px}.kbd button{padding:8px}
+.progress{height:10px;background:#e5e7eb;border-radius:99px;overflow:hidden}.progress i{display:block;height:100%;background:#111827}
+.whiteboard{background:white;border:7px solid #d6d3d1;border-radius:16px;padding:18px;min-height:220px}.wb{opacity:.15;transition:.5s;margin:12px 0}.wb.show{opacity:1}
+.login{max-width:560px;margin:28px auto}
+@media(max-width:600px){.grid{grid-template-columns:1fr}.kbd{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+<header><div class="wrap" style="padding:0"><div class="brand">قدرات نايترو</div></div></header>
+<main class="wrap" id="app"></main>
+
+<script>
+(function(){
+"use strict";
+const app=document.getElementById("app");
+const S="nitro_v2";
+const $=id=>document.getElementById(id);
+let db;
+try{db=JSON.parse(localStorage.getItem(S)||"null")}catch(e){db=null}
+if(!db){db={user:null,users:[{id:"owner",name:"المالك",email:"owner@nitro.local",role:"owner",access:"all",code:"OWNER-001",active:true,expires:"2099-12-31"}],plan:{days:90,done:{}},progress:{},notes:"",tickets:[]}}
+function save(){localStorage.setItem(S,JSON.stringify(db))}
+
+const quantitative=[
+{id:"ratio",title:"النسبة والتناسب",m:"النسبة تقارن بين كميتين، والتناسب يعني أن العلاقة بينهما ثابتة.",w:"إذا تضاعفت الكمية بنفس النسبة، تتضاعف القيمة المرتبطة بها في التناسب الطردي.",h:"2 عصير = 10 ريال. 4 عصير تعني ضعف الكمية، إذن السعر 20 ريال.",r:"زادت الكميتان معًا: فكر بالطردي. زادت واحدة ونقصت الثانية: فكر بالعكسي.",x:"حدد نوع العلاقة قبل الضرب التبادلي.",qs:[["3 دفاتر بـ12 ريال. 6 دفاتر؟",["18","20","24","30"],2,"تضاعفت الكمية، إذن السعر 24."],["زيادة العمال مع ثبات العمل تجعل الزمن:",["يزيد","ينقص","يثبت","يتضاعف"],1,"علاقة عكسية: العمال أكثر، الأيام أقل."],["8:12 بأبسط صورة؟",["2:3","3:2","4:5","1:2"],0,"نقسم الطرفين على 4."]]},
+{id:"percent",title:"النسبة المئوية",m:"النسبة المئوية جزء من كل 100.",w:"25% تعني 25 من 100.",h:"20% من 50 = 0.20 × 50 = 10.",r:"10% = العدد ÷ 10.",x:"حوّل % إلى عدد عشري قبل الضرب.",qs:[["25% من 80؟",["10","20","25","40"],1,"ربع 80 = 20."],["زاد 200 بنسبة 10%؟",["210","220","230","240"],1,"الزيادة 20، فيصير 220."],["50 من 200؟",["20%","25%","40%","50%"],1,"50÷200=.25=25%."]]}
+];
+const verbal=[
+{id:"analogy",title:"التناظر اللفظي",m:"المطلوب علاقة مشابهة بين زوجين من الكلمات.",w:"نقيس نوع العلاقة، مو تشابه الكلمات.",h:"طبيب:مستشفى ← معلم:مدرسة.",r:"كوّن جملة قصيرة تربط الكلمتين.",x:"لا تختار على التشابه السطحي.",qs:[["طبيب:مستشفى = معلم:؟",["كتاب","مدرسة","طالب","قلم"],1,"شخص ومكان عمله."],["قلم:كتابة = فرشاة:؟",["لون","رسم","ورق","صورة"],1,"أداة واستخدامها."],["عين:رؤية = أذن:؟",["شم","سمع","كلام","لمس"],1,"عضو ووظيفته."]]}
+];
+
+function home(){
+ if(!db.user){login();return}
+ const u=db.user;
+ app.innerHTML=`<div class="card"><h2>هلا ${u.name}</h2><p class="muted">الدور: ${u.role==="owner"?"مالك":"طالب"} • الباقة: ${u.access==="all"?"كمي + لفظي":u.access}</p></div>
+ ${u.role==="owner"?`<div class="grid"><button class="choice f" data-action="admin"><b>👑 الإدارة</b><br>الطلاب والرموز والصلاحيات</button><button class="choice t" data-action="plan"><b>🗓️ الخطة</b><br>تتغير بأي وقت</button></div>`:""}
+ <div class="grid"><button class="choice f" data-stage="foundation"><b>📘 التأسيس</b><br>شرح → أسئلة → اختبار قسم</button><button class="choice t" data-stage="training"><b>🎯 التدريب</b><br>سهل → متوسط → صعب → محاكاة</button></div>
+ <div class="grid"><button class="card" data-action="plan"><b>🗓️ خطتي ${db.plan.days} يوم</b></button><button class="card" data-action="coach"><b>🤖 مدرب نايترو</b></button></div>
+ <div class="grid"><button class="card" data-action="notes"><b>📓 دفتري</b></button><button class="card" data-action="support"><b>🛟 الدعم الفني</b></button></div>
+ <button class="btn secondary" data-action="logout">خروج</button>`;
+ bindHome();
+}
+function bindHome(){
+ app.querySelectorAll("[data-stage]").forEach(b=>b.onclick=()=>stage(b.dataset.stage));
+ app.querySelectorAll("[data-action]").forEach(b=>b.onclick=()=>{const a=b.dataset.action;if(a==="admin")admin();if(a==="plan")plan();if(a==="coach")coach();if(a==="notes")notes();if(a==="support")support();if(a==="logout"){db.user=null;save();home()}});
+}
+function login(){
+ app.innerHTML=`<div class="card login"><h1>قدرات نايترو</h1><p class="muted">تسجيل الدخول</p><label>البريد</label><input id="loginEmail" placeholder="البريد"><label>الرمز الخاص</label><input id="loginCode" placeholder="الرمز الخاص"><button class="btn primary" id="loginBtn">دخول</button><p class="muted">للتجربة: owner@nitro.local<br>OWNER-001</p></div>`;
+ $("loginBtn").onclick=()=>{const e=$("loginEmail").value.trim(),c=$("loginCode").value.trim();const u=db.users.find(x=>x.email===e&&x.code===c&&x.active);if(!u){alert("بيانات الدخول غير صحيحة");return}db.user=u;save();home()};
+}
+function stage(s){
+ app.innerHTML=`<button class="btn secondary" id="backHome">الرئيسية</button><div class="card"><h2>${s==="foundation"?"التأسيس":"التدريب"}</h2><p class="muted">كل قسم لحاله. بعد إنهاء قواعد القسم يكون له اختبار مستقل.</p></div><div class="grid"><button class="choice f" id="qBtn"><b>🔢 الكمي</b></button><button class="choice f" id="vBtn"><b>📝 اللفظي</b></button></div>`;
+ $("backHome").onclick=home;$("qBtn").onclick=()=>section(s,"q");$("vBtn").onclick=()=>section(s,"v");
+}
+function section(s,t){
+ const arr=t==="q"?quantitative:verbal;
+ app.innerHTML=`<button class="btn secondary" id="backStage">رجوع</button><div class="card"><h2>${t==="q"?"الكمي":"اللفظي"}</h2><p class="muted">بعد كل قاعدة: شرح ثم 3 أسئلة. وبعد نهاية القسم: اختبار منفصل بأسئلة مختلفة.</p></div>${arr.map((l,i)=>`<div class="card"><span class="pill">القاعدة ${i+1}</span><h3>${l.title}</h3><button class="btn primary lessonBtn" data-id="${l.id}">ابدأ</button></div>`).join("")}<div class="card"><h3>اختبار القسم</h3><button class="btn primary" id="sectionExam">ابدأ الاختبار</button></div>`;
+ $("backStage").onclick=()=>stage(s);app.querySelectorAll(".lessonBtn").forEach(b=>b.onclick=()=>lesson(s,t,b.dataset.id));$("sectionExam").onclick=()=>alert("اختبار القسم المستقل هو الخطوة التالية في البناء.");
+}
+function lesson(s,t,id){
+ const arr=t==="q"?quantitative:verbal,l=arr.find(x=>x.id===id);
+ app.innerHTML=`<button class="btn secondary" id="backSection">رجوع</button><div class="card"><h2>${l.title}</h2><div class="tabs"><button class="on mediaTab" data-media="video">🎬 شرح بصري</button><button class="mediaTab" data-media="audio">🔊 صوت</button><button class="mediaTab" data-media="read">📖 قراءة</button></div>
+ <div id="video" class="media"><div class="whiteboard" id="wb"><div class="wb"><h3>${l.title}</h3></div><div class="wb">${l.m}</div><div class="wb">${l.h}</div><div class="wb"><b>${l.r}</b></div></div><button class="btn primary" id="playBtn">▶ تشغيل</button><p class="muted">شرح بصري داخل الموقع. الفيديو الحقيقي بشخص وصبورة وصوت سعودي يحتاج إنتاج فيديو فعلي منفصل.</p></div>
+ <div id="audio" class="media hidden"><p>${l.m} ${l.h}</p><button class="btn primary" id="speakBtn">تشغيل الصوت</button></div>
+ <div id="read" class="media hidden"><div class="read why"><b>وش تعني؟</b><br>${l.m}</div><div class="read why"><b>ليش؟</b><br>${l.w}</div><div class="read how"><b>كيف؟</b><br>${l.h}</div><div class="read remember"><b>تذكّر</b><br>${l.r}</div><div class="read mistake"><b>خطأ شائع</b><br>${l.x}</div></div></div>
+ <div class="card"><h3>3 أسئلة بعد القاعدة</h3>${l.qs.map((qq,qi)=>`<div class="q"><b>${qi+1}. ${qq[0]}</b>${qq[1].map((o,oi)=>`<button class="option" data-q="${qi}" data-o="${oi}">${o}</button>`).join("")}</div>`).join("")}<button class="btn primary" id="finishQuiz">إنهاء الأسئلة</button><div id="result"></div></div>
+ <div class="card"><h3>✍️ اكتب طريقة حلك</h3><textarea id="work" rows="5"></textarea><div class="kbd">${["+","−","×","÷","=","%","(",")","²","√","π","/"].map(k=>`<button class="mathKey" data-k="${k}">${k}</button>`).join("")}</div></div>`;
+ $("backSection").onclick=()=>section(s,t);
+ app.querySelectorAll(".mediaTab").forEach(b=>b.onclick=()=>{app.querySelectorAll(".mediaTab").forEach(x=>x.classList.remove("on"));b.classList.add("on");app.querySelectorAll(".media").forEach(x=>x.classList.add("hidden"));$(b.dataset.media).classList.remove("hidden")});
+ $("playBtn").onclick=()=>{const ss=[...app.querySelectorAll("#wb .wb")];ss.forEach(x=>x.classList.remove("show"));let i=0;const timer=setInterval(()=>{if(i>=ss.length){clearInterval(timer);return}ss[i++].classList.add("show")},800);speak(l.m+" "+l.h+" "+l.r)};
+ $("speakBtn").onclick=()=>speak(l.m+" "+l.h);
+ app.querySelectorAll(".option").forEach(b=>b.onclick=()=>{app.querySelectorAll(`.option[data-q="${b.dataset.q}"]`).forEach(x=>x.classList.remove("sel"));b.classList.add("sel")});
+ $("finishQuiz").onclick=()=>finishQuiz(s,t,l);
+ app.querySelectorAll(".mathKey").forEach(b=>b.onclick=()=>{$("work").value+=b.dataset.k;$("work").focus()});
+}
+function speak(text){if(!("speechSynthesis" in window)){alert("الصوت غير مدعوم هنا");return}window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="ar-SA";u.rate=.92;window.speechSynthesis.speak(u)}
+function finishQuiz(s,t,l){
+ const ans=[];for(let i=0;i<3;i++){const x=app.querySelector(`.sel[data-q="${i}"]`);if(!x){alert("جاوب الثلاثة أول");return}ans.push(Number(x.dataset.o))}
+ let sc=0,h="";l.qs.forEach((qq,i)=>{const ok=ans[i]===qq[2];if(ok)sc++;h+=`<div class="read ${ok?"remember":"mistake"}"><b>${ok?"صحيح ✓":"غير صحيح"}</b><br>${qq[3]}</div>`});const p=Math.round(sc/3*100);db.progress[s+"_"+t+"_"+l.id]=p;save();$("result").innerHTML=`<h3>نتيجتك ${p}%</h3>${p<90?'<div class="read why">أقل من 90%: ارجع للشرح بطريقة ثانية ثم أعد التدريب.</div>':""}${h}`;
+}
+function plan(){
+ const d=Number(db.plan.days)||90,done=db.plan.done||{},c=Object.values(done).filter(Boolean).length;
+ app.innerHTML=`<button class="btn secondary" id="backHome">الرئيسية</button><div class="card"><h2>🗓️ خطتي</h2><label>مدة الخطة بالأيام</label><input id="planDays" type="number" min="7" max="365" value="${d}"><button class="btn primary" id="changePlan">تغيير الخطة</button><p class="muted">الاشتراك سنة، والخطة تتغير بأي وقت. هنا ما فيه حد 14 يوم.</p><div class="progress"><i style="width:${Math.round(c/d*100)}%"></i></div></div><div id="days">${Array.from({length:d},(_,i)=>{const n=i+1,p=n<=Math.round(d*.34)?"تأسيس":n<=Math.round(d*.78)?"تدريب":"محاكاة واختبارات";return `<div class="day"><div><b>اليوم ${n}</b><br><span class="pill">${p}</span></div><input class="dayCheck" data-n="${n}" type="checkbox" ${done[n]?"checked":""}></div>`}).join("")}</div>`;
+ $("backHome").onclick=home;$("changePlan").onclick=()=>{db.plan.days=Math.max(7,Math.min(365,Number($("planDays").value)||90));db.plan.done={};save();plan()};app.querySelectorAll(".dayCheck").forEach(c=>c.onchange=()=>{db.plan.done[c.dataset.n]=c.checked;save()});
+}
+function admin(){
+ if(db.user.role!=="owner"){home();return}
+ app.innerHTML=`<button class="btn secondary" id="backHome">الرئيسية</button><div class="card"><h2>👑 الإدارة</h2><p class="muted">رمز فريد لكل طالب لمدة سنة.</p><input id="newName" placeholder="الاسم"><input id="newEmail" placeholder="البريد"><input id="newPhone" placeholder="الجوال"><select id="newRole"><option value="student">طالب</option><option value="supervisor">مشرف</option></select><select id="newAccess"><option value="all">كمي + لفظي</option><option value="quantitative">كمي</option><option value="verbal">لفظي</option></select><button class="btn primary" id="createUser">إنشاء المستخدم والرمز</button></div><div id="users">${db.users.map(u=>`<div class="day"><div><b>${u.name}</b> <span class="pill">${u.role}</span><br><span class="muted">${u.email} • ${u.code}</span></div>${u.id!=="owner"?`<button class="btn ${u.active?"danger":"primary"} toggleUser" data-id="${u.id}">${u.active?"إيقاف":"تفعيل"}</button>`:""}</div>`).join("")}</div>`;
+ $("backHome").onclick=home;$("createUser").onclick=()=>{const n=$("newName").value.trim(),e=$("newEmail").value.trim(),p=$("newPhone").value.trim();if(!n||!e||!p){alert("كمل البيانات");return}const role=$("newRole").value,code=(role==="supervisor"?"SUP-":"STU-")+Math.random().toString(36).slice(2,8).toUpperCase();const d=new Date();d.setFullYear(d.getFullYear()+1);db.users.push({id:String(Date.now()),name:n,email:e,phone:p,role,access:$("newAccess").value,code,active:true,expires:d.toISOString().slice(0,10)});save();alert("الرمز الخاص: "+code);admin()};app.querySelectorAll(".toggleUser").forEach(b=>b.onclick=()=>{const u=db.users.find(x=>x.id===b.dataset.id);u.active=!u.active;save();admin()});
+}
+function notes(){app.innerHTML=`<button class="btn secondary" id="backHome">الرئيسية</button><div class="card"><h2>📓 دفتري</h2><textarea id="notesBox" rows="18">${db.notes||""}</textarea><button class="btn primary" id="saveNotes">حفظ</button></div>`;$("backHome").onclick=home;$("saveNotes").onclick=()=>{db.notes=$("notesBox").value;save();alert("تم الحفظ")}}
+function support(){app.innerHTML=`<button class="btn secondary" id="backHome">الرئيسية</button><div class="card"><h2>🛟 الدعم الفني</h2><input id="ticketTitle" placeholder="عنوان المشكلة"><textarea id="ticketBody" rows="7" placeholder="التفاصيل"></textarea><button class="btn primary" id="sendTicket">إرسال</button></div>`;$("backHome").onclick=home;$("sendTicket").onclick=()=>{const t=$("ticketTitle").value.trim(),b=$("ticketBody").value.trim();if(!t||!b){alert("اكتب المشكلة والتفاصيل");return}db.tickets.push({title:t,body:b,at:Date.now()});save();alert("تم إرسال التذكرة")}}
+function coach(){app.innerHTML=`<button class="btn secondary" id="backHome">الرئيسية</button><div class="card"><h2>🤖 مدرب نايترو</h2><p class="muted">واجهة مبدئية للمدرب المتخصص بالقدرات فقط.</p><textarea id="aiQuestion" rows="5" placeholder="مثال: ما فهمت التناسب العكسي"></textarea><button class="btn primary" id="askAi">إرسال</button><div id="chat"></div></div>`;$("backHome").onclick=home;$("askAi").onclick=()=>{const q=$("aiQuestion").value;const a=q.includes("تناسب")?"إذا زادت واحدة ونقصت الثانية فغالبًا العلاقة عكسية. اكتب لي مثال المسألة وأنا أمشي معك خطوة خطوة.":"حدد اسم القاعدة أو اكتب السؤال نفسه، وأنا أشرح لك خطوة بخطوة.";$("chat").innerHTML+=`<div class="read how">${a}</div>`}}
+home();
+})();
+</script>
+</body>
+</html>
